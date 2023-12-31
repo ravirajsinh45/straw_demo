@@ -1,0 +1,6 @@
+altair==4.0.0
+Pillow==10.1.0
+python-dotenv==1.0.0
+roboflow==1.1.14
+rpds-py==0.15.2
+streamlit==1.12.0
