@@ -12,7 +12,11 @@ load_dotenv()
 
 
 try:
-    api_key = os.environ['ROBOFLOW_API_KEY'] 
+    try:
+        api_key = os.environ['ROBOFLOW_API_KEY'] 
+    except:
+        api_key=None
+        
     if not api_key:
         api_key = st.secrets['ROBOFLOW_API_KEY']
         if not api_key:
