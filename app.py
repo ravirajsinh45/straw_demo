@@ -37,7 +37,7 @@ except:
 
 
 # Function to make predictions using the Roboflow model
-def predict_image(image_content, confidence=40, overlap=30):
+def predict_image(image_content, confidence=60, overlap=30):
     # Infer on a local image
     # image = Image.open(BytesIO(image_content))
     
@@ -50,7 +50,7 @@ def predict_image(image_content, confidence=40, overlap=30):
     return predictions
 
 # Function to make predictions using the Roboflow model with an image URL
-def predict_image_url(image_url, confidence=40, overlap=30):
+def predict_image_url(image_url, confidence=60, overlap=30):
     # Infer on an image hosted elsewhere
     predictions = model.predict(image_url, hosted=True, confidence=confidence, overlap=overlap).json()
     return predictions
@@ -99,13 +99,11 @@ def main():
                 # st.image(image, caption="Uploaded Image.", use_column_width=True)
 
             
-                # Confidence and overlap sliders
-                confidence = 60 # st.slider("Confidence", min_value=0, max_value=100, value=40)
-                overlap = 60 #st.slider("Overlap", min_value=0, max_value=100, value=30)
+
 
             
                 # Make predictions using the Roboflow model
-                predictions = predict_image(temp_file_path, confidence, overlap)
+                predictions = predict_image(temp_file_path)
 
                 # Draw rectangles on the image based on predictions
                 annotated_image = draw_rectangles(image.copy(), predictions)
