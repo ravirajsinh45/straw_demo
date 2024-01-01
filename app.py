@@ -82,7 +82,7 @@ def main():
 
         if detection_method == "Image Upload":
             # File uploader for image upload
-            uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"])
+            uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
             if uploaded_file is not None:
                 # Display the uploaded image
