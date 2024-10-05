@@ -12,6 +12,10 @@ model = get_model(model_id=f"{project_name}/{version}")
 # Streamlit app
 st.title("Straw Head Counting")
 
+# Add sliders for adjusting confidence and threshold
+confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.5, 0.05)
+detection_threshold = st.slider("Detection Threshold", 0.0, 1.0, 0.3, 0.05)
+
 # Upload image
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
@@ -23,8 +27,8 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     if st.button("Infer Image"):
-        # Run inference
-        results = model.infer(image)[0]
+        # Run inference with the adjusted thresholds
+        results = model.infer(image, confidence=confidence_threshold, threshold=detection_threshold)[0]
         detections = sv.Detections.from_inference(results)
 
         # Annotate the image with bounding boxes and labels
