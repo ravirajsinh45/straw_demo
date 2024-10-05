@@ -5,4 +5,3 @@ roboflow==1.1.14
 rpds-py==0.15.2
 streamlit==1.12.0
 watchdog
-opencv-python
