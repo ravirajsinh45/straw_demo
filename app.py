@@ -1,13 +1,13 @@
 import streamlit as st
 from PIL import Image
-import supervision as sv
-from inference import get_model
 import numpy as np
+import torch
+from ultralytics import YOLO
+import cv2
 
-# Load the model
-project_name = "semen-straw-counting"
-version = 2
-model = get_model(model_id=f"{project_name}/{version}")
+# Load the YOLO model (ensure the path to your custom model is correct)
+model_path = "model/straw_06102024.pt"  # Update with the path to your YOLO custom model
+model = YOLO(model_path)
 
 # Streamlit app
 st.title("Straw Head Counting")
@@ -27,22 +27,26 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     if st.button("Infer Image"):
-        # Run inference with the adjusted thresholds
-        results = model.infer(image, confidence=confidence_threshold, threshold=detection_threshold)[0]
-        detections = sv.Detections.from_inference(results)
+        # Convert the image to a format suitable for the model
+        image_np = np.array(image)
 
-        # Annotate the image with bounding boxes and labels
-        bounding_box_annotator = sv.BoxAnnotator()
-        label_annotator = sv.LabelAnnotator()
-        
-        annotated_image = bounding_box_annotator.annotate(scene=image, detections=detections)
-        # annotated_image = label_annotator.annotate(scene=annotated_image, detections=detections)
+        # Run YOLO inference with confidence and detection thresholds
+        results = model.predict(image_np, conf=confidence_threshold, iou=detection_threshold)
 
-        # Convert to displayable format
-        annotated_image = np.array(annotated_image)
+        # Get the bounding boxes
+        bboxes = results[0].boxes.xyxy  # (x1, y1, x2, y2) format
+        image_np_copy = image_np.copy()
+
+        # Draw bounding boxes with a light border
+        for bbox in bboxes:
+            x1, y1, x2, y2 = map(int, bbox)  # Convert to integers
+            cv2.rectangle(image_np_copy, (x1, y1), (x2, y2), (255, 255, 255), 2)  # White box with 2px thickness
+
+        # Convert annotated image back to PIL format for Streamlit
+        annotated_image = Image.fromarray(image_np_copy)
 
         # Display the annotated image
         st.image(annotated_image, caption="Annotated Image", use_column_width=True)
 
-        # Display number of objects detected
-        st.write(f"Number of objects detected: {len(detections)}")
+        # Display the number of objects detected
+        st.write(f"Number of objects detected: {len(bboxes)}")
