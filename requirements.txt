@@ -3,3 +3,4 @@ requests
 supervision
 watchdog
 inference
+ultralytics
