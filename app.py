@@ -12,6 +12,10 @@ model = YOLO(model_path)
 # Streamlit app
 st.title("Straw Head Counting")
 
+# Add sliders for adjusting confidence and threshold
+confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
+detection_threshold = st.slider("Detection Threshold", 0.0, 1.0, 0.4, 0.05)
+
 # Upload image
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
@@ -31,7 +35,7 @@ if uploaded_file is not None:
         grayscale_3ch = cv2.merge([grayscale_image] * 3)  # Stack the grayscale image into 3 channels
 
         # Run YOLO inference on the 3-channel grayscale image
-        results = model.predict(grayscale_3ch, conf=0.35, iou=0.35)
+        results = model.predict(grayscale_3ch, conf=confidence_threshold, iou=detection_threshold)
 
         # Get the bounding boxes
         bboxes = results[0].boxes.xyxy  # (x1, y1, x2, y2) format
