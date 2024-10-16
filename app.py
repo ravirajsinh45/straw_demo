@@ -6,7 +6,7 @@ from ultralytics import YOLO
 import cv2
 
 # Load the YOLO model (ensure the path to your custom model is correct)
-model_path = "model/straw_07102024.pt"  # Update with the path to your YOLO custom model
+model_path = "model/straw_16102024_small_gray.pt"  # Update with the path to your YOLO custom model
 model = YOLO(model_path)
 
 # Streamlit app
