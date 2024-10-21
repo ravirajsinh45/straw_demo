@@ -6,8 +6,11 @@ from ultralytics import YOLO
 import cv2
 
 # Load the YOLO model (ensure the path to your custom model is correct)
-model_path = "model/straw_16102024_small_gray.pt"  # Update with the path to your YOLO custom model
-model = YOLO(model_path)
+roi_model_path = "model/straw_roi_only_21102024.pt"  # Update with the path to your YOLO custom model
+roi_model = YOLO(roi_model_path)
+
+straw_model_path = "model/straw_on_cropped_21102024.pt"
+straw_model = YOLO(straw_model_path)
 
 # Streamlit app
 st.title("Straw Head Counting")
@@ -27,30 +30,47 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
     if st.button("Infer Image"):
-        # Convert the image to a format suitable for the model (grayscale)
+        # Convert the image to numpy array
         image_np = np.array(image)
-        grayscale_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)  # Convert to grayscale
 
-        # Convert grayscale back to 3-channel image by stacking the grayscale image
-        grayscale_3ch = cv2.merge([grayscale_image] * 3)  # Stack the grayscale image into 3 channels
+        # Run YOLO inference to detect ROI and straws
+        results = roi_model.predict(image_np, conf=0.3, iou=0.4)
 
-        # Run YOLO inference on the 3-channel grayscale image
-        results = model.predict(grayscale_3ch, conf=confidence_threshold, iou=detection_threshold)
+        # Filter the detections for ROI first
+        rois = [box for box in results[0].boxes if int(box.cls) == 0]  # Assuming class '1' is the ROI
 
-        # Get the bounding boxes
-        bboxes = results[0].boxes.xyxy  # (x1, y1, x2, y2) format
+        if len(rois) > 0:
+            # Take the first ROI detected (or handle multiple if necessary)
+            roi_bbox = rois[0].xyxy[0]  # Extract the bounding box for ROI (x1, y1, x2, y2)
+            x1, y1, x2, y2 = map(int, roi_bbox)  # Convert to integers
 
-        # Draw bounding boxes on the original color image
-        image_np_copy = image_np.copy()
-        for bbox in bboxes:
-            x1, y1, x2, y2 = map(int, bbox)  # Convert to integers
-            cv2.rectangle(image_np_copy, (x1, y1), (x2, y2), (255, 255, 255), 2)  # White box with 2px thickness
+            # Crop the image based on the ROI
+            cropped_image = image_np[y1:y2, x1:x2]
 
-        # Convert annotated image back to PIL format for Streamlit
-        annotated_image = Image.fromarray(image_np_copy)
+            # Convert the cropped image to grayscale
+            grayscale_cropped_image = cv2.cvtColor(cropped_image, cv2.COLOR_RGB2GRAY)
 
-        # Display the annotated image
-        st.image(annotated_image, caption="Annotated Image", use_column_width=True)
+            # Convert grayscale to 3-channel image to make it compatible with the model
+            grayscale_3ch_cropped = cv2.merge([grayscale_cropped_image] * 3)
 
-        # Display the number of objects detected
-        st.write(f"Number of objects detected: {len(bboxes)}")
+            # Run YOLO inference again on the grayscale cropped ROI to detect straws
+            cropped_results = straw_model.predict(grayscale_3ch_cropped, conf=confidence_threshold, iou=detection_threshold)
+
+            # Get the bounding boxes for straws from the cropped image
+            straw_bboxes = [box for box in cropped_results[0].boxes if int(box.cls) == 0]  
+
+            # Draw bounding boxes for straws on the grayscale cropped image
+            for bbox in straw_bboxes:
+                sx1, sy1, sx2, sy2 = map(int, bbox.xyxy[0])
+                cv2.rectangle(cropped_image, (sx1, sy1), (sx2, sy2), (255, 255, 255), 2)  # White box with 2px thickness
+
+            # Convert the cropped grayscale annotated image back to PIL format for Streamlit
+            annotated_cropped_image = Image.fromarray(cropped_image)
+
+            # Display the cropped and annotated image with straws
+            st.image(annotated_cropped_image, caption="Cropped Grayscale Image with Straws", use_column_width=True)
+
+            # Display the number of straws detected
+            st.write(f"Number of straws detected: {len(straw_bboxes)}")
+        else:
+            st.write("No ROI detected.")
