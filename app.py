@@ -6,10 +6,10 @@ from ultralytics import YOLO
 import cv2
 
 # Load the YOLO model (ensure the path to your custom model is correct)
-roi_model_path = "model/straw_roi_only_21102024.pt"  # Update with the path to your YOLO custom model
+roi_model_path = "model/straw_roi_only_24102024.pt"  # Update with the path to your YOLO custom model
 roi_model = YOLO(roi_model_path)
 
-straw_model_path = "model/straw_on_cropped_21102024.pt"
+straw_model_path = "model/straw_24102024_gray_736.pt"
 straw_model = YOLO(straw_model_path)
 
 # Streamlit app
@@ -53,8 +53,13 @@ if uploaded_file is not None:
             # Convert grayscale to 3-channel image to make it compatible with the model
             grayscale_3ch_cropped = cv2.merge([grayscale_cropped_image] * 3)
 
+            color_cropped_resized = cv2.resize(cropped_image,(736,736))
+            grayscale_3ch_cropped_resized = cv2.resize(grayscale_3ch_cropped,(736,736))
+
             # Run YOLO inference again on the grayscale cropped ROI to detect straws
-            cropped_results = straw_model.predict(grayscale_3ch_cropped, conf=confidence_threshold, iou=detection_threshold)
+            cropped_results = straw_model.predict(grayscale_3ch_cropped_resized, 
+                                                  conf=confidence_threshold, 
+                                                  iou=detection_threshold)
 
             # Get the bounding boxes for straws from the cropped image
             straw_bboxes = [box for box in cropped_results[0].boxes if int(box.cls) == 0]  
@@ -62,10 +67,10 @@ if uploaded_file is not None:
             # Draw bounding boxes for straws on the grayscale cropped image
             for bbox in straw_bboxes:
                 sx1, sy1, sx2, sy2 = map(int, bbox.xyxy[0])
-                cv2.rectangle(cropped_image, (sx1, sy1), (sx2, sy2), (255, 255, 255), 2)  # White box with 2px thickness
+                cv2.rectangle(color_cropped_resized, (sx1, sy1), (sx2, sy2), (255, 255, 255), 2)  # White box with 2px thickness
 
             # Convert the cropped grayscale annotated image back to PIL format for Streamlit
-            annotated_cropped_image = Image.fromarray(cropped_image)
+            annotated_cropped_image = Image.fromarray(color_cropped_resized)
 
             # Display the cropped and annotated image with straws
             st.image(annotated_cropped_image, caption="Cropped Grayscale Image with Straws", use_column_width=True)
