@@ -9,14 +9,14 @@ import cv2
 roi_model_path = "model/straw_roi_only_24102024.pt"  # Update with the path to your YOLO custom model
 roi_model = YOLO(roi_model_path)
 
-straw_model_path = "model/straw_02022024_gray_736.pt"
+straw_model_path = "model/straw_03022024_gray_736.pt"
 straw_model = YOLO(straw_model_path)
 
 # Streamlit app
 st.title("Straw Head Counting")
 
 # Add sliders for adjusting confidence and threshold
-confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
+confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.3, 0.05)
 detection_threshold = 0.4 #st.slider("Detection Threshold", 0.0, 1.0, 0.5, 0.05)
 
 # Upload image
