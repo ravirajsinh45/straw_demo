@@ -9,7 +9,7 @@ import cv2
 roi_model_path = "model/straw_roi_only_24102024.pt"  # Update with the path to your YOLO custom model
 roi_model = YOLO(roi_model_path)
 
-straw_model_path = "model/straw_09022025_gray_736.pt"
+straw_model_path = "model/straw_07022024_gray_736.pt"
 straw_model = YOLO(straw_model_path)
 
 # Streamlit app
