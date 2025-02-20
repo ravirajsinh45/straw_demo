@@ -16,7 +16,7 @@ straw_model = YOLO(straw_model_path)
 st.title("Straw Head Counting")
 
 # Add sliders for adjusting confidence and threshold
-confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.25, 0.05)
+confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.30, 0.05)
 detection_threshold = 0.6 #st.slider("Detection Threshold", 0.0, 1.0, 0.5, 0.05)
 
 # Upload image
