@@ -6,7 +6,7 @@ from ultralytics import YOLO
 import cv2
 
 # Load the YOLO model (ensure the path to your custom model is correct)
-roi_model_path = "model/straw_roi_only_24102024.pt"  # Update with the path to your YOLO custom model
+roi_model_path = "model/straw_roi_only_21022025.pt"  # Update with the path to your YOLO custom model
 roi_model = YOLO(roi_model_path)
 
 straw_model_path = "model/straw_21022025_gray_736.pt"
