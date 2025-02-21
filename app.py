@@ -17,7 +17,7 @@ st.title("Straw Head Counting")
 
 # Add sliders for adjusting confidence and threshold
 confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.30, 0.05)
-detection_threshold = 0.5 #st.slider("Detection Threshold", 0.0, 1.0, 0.5, 0.05)
+detection_threshold = 0.4 #st.slider("Detection Threshold", 0.0, 1.0, 0.5, 0.05)
 
 # Upload image
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
